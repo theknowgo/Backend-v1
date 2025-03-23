@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "decentro",
+      "source": "@decentro/v1.0#2tqim5ntwvox",
+      "integrity": "sha512-rUjSlq++QCSD3GLIcw0qtWn7k/L8blrtUKGwkAmb36uqwn7EsoJj0h0YVBYxDKyAXW91gL9DJ87hcqZbG3/drQ==",
+      "installerVersion": "6.1.3"
+    }
+  ]
+}
