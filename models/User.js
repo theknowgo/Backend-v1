@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   userType: {
     type: String,
     required: [true, "User type is required"],
-    enum: ["Admin", "Customer", "Localmate"],
+    enum: ["Customer", "Localmate"],
     default: "Customer",
   },
   contactNumber: {

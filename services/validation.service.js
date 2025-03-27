@@ -5,7 +5,7 @@ export const validateUserRegistration = [
   body("lastName").notEmpty().withMessage("Last name is required"),
   body("is18plus").notEmpty().withMessage("Date of birth is required"),
   body("userType")
-    .isIn(["Admin", "Customer", "Partner"])
+    .isIn(["Customer", "Localmate"])
     .withMessage("Invalid user type"),
   body("contactNumber")
     .notEmpty()

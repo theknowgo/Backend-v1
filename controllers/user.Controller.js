@@ -63,7 +63,7 @@ export const loginUser = async (req, res) => {
   if (!user) {
     return res
       .status(401)
-      .json(createResponse(false, "Invalid contact number"));
+      .json(createResponse(false, "User with this number does not exist"));
   }
 
   if (user.isPermanentlyBanned) {

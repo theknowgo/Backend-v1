@@ -4,7 +4,7 @@ import User from "../models/User.js";
 export const handleValidationErrors = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ status: false, message: errors.array() });
   }
 };
 
