@@ -1,32 +1,31 @@
 import mongoose from "mongoose";
 
-const orderSchema = new mongoose.Schema({
-  orderId: {
-    type: String,
-    default: () => new mongoose.Types.ObjectId().toString(),
-    unique: true,
+const orderSchema = new mongoose.Schema(
+  {
+    customerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    partnerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    orderDetailId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OrderDetail",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["Pending", "Accepted", "Ongoing", "Completed", "Cancelled"],
+      required: true,
+      default: "Pending",
+    },
   },
-  customerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  partnerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  orderDetailId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "OrderDetail",
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ["Completed", "Ongoing", "Cancelled"],
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 const Order = mongoose.model("Order", orderSchema);
 
