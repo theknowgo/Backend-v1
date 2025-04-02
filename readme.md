@@ -1,377 +1,362 @@
-# 🚀 API Documentation
+## Endpoint: POST api/v1/users/register
 
-Welcome to the **KnowGo Backend API** documentation! Here, you'll find all the details you need to interact with our API endpoints effectively. Let's get started! 🎉
+### Description
+This endpoint allows a new user to register. It requires the user's details and validates the input data. If the registration is successful, a new user is created, and a JWT token is returned along with the user details.
 
----
-
-## 🧑‍💻 User Routes
-
-### 🔐 Register User
-**POST** `/register`  
-Create a new account and join the platform.
-
-**Request Body:**
+### Request Body (JSON)
+The body of the request should contain the following fields:
 ```json
 {
-  "firstName": "string",
-  "lastName": "string",
-  "is18plus": "boolean",
-  "userType": "string",
-  "contactNumber": "string",
-  "hashedOTP": "string",
-  "inputOTP": "string"
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.1222@example.com",
+    "dob": "1990-01-01",
+    "userType": "Customer",
+    "contactNumber": 9555450842,
+    "password": "hashedPassword123"
 }
 ```
 
-**Responses:**
-- `201 Created`: 🎉 User registered successfully.
-- `400 Bad Request`: ⚠️ Validation errors or user already exists.
-- `401 Unauthorized`: ❌ Invalid OTP.
+### Validation Rules
+- `firstName`: Required and should not be empty.
+- `lastName`: Required and should not be empty.
+- `email`: Required and must be a valid email format.
+- `password`: Required and must be at least 6 characters long.
+- `dob`: Required and should be a valid date in YYYY-MM-DD format.
+- `userType`: Required (e.g., "Customer", "Admin").
+- `contactNumber`: Required and must be a valid phone number.
 
----
+### Responses
 
-### 🔑 Login User
-**POST** `/login`  
-Access your account with valid credentials.
-
-**Request Body:**
+#### Success (201 - Created)
+If the user is successfully registered, the response will contain the token (JWT token) for authentication and the user object with the newly registered user’s information.
 ```json
 {
-  "contactNumber": "string",
-  "hashedOTP": "string",
-  "inputOTP": "string"
+    "token": "jwt.token.here",
+    "user": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.1222@example.com",
+        "dob": "1990-01-01",
+        "userType": "Customer",
+        "contactNumber": 9555450842
+    }
 }
 ```
 
-**Responses:**
-- `200 OK`: ✅ Logged in successfully.
-- `401 Unauthorized`: ❌ Invalid OTP or user does not exist.
-- `403 Forbidden`: 🚫 User is banned.
-
----
-
-### 🚪 Logout User
-**GET** `/logout`  
-Securely log out of your account.
-
-**Headers:**
-- `Authorization`: Bearer token.
-
-**Responses:**
-- `200 OK`: 👋 Logged out successfully.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-### ⭐ Submit Rating
-**POST** `/rating`  
-Rate your experience with a partner.
-
-**Request Body:**
+#### Bad Request (400 - Validation Error)
+If any of the input fields fail validation, the response will be a 400 error with an array of error messages indicating what went wrong.
 ```json
 {
-  "partnerId": "string",
-  "rating": "number"
+    "errors": [
+        { "msg": "First name is required" },
+        { "msg": "Email is invalid" }
+    ]
 }
 ```
 
-**Responses:**
-- `200 OK`: 🌟 Rating submitted successfully.
-- `404 Not Found`: ❌ Partner not found.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-### 📍 Set Default Address
-**PATCH** `/address/:userId/default`  
-Choose your default address for convenience.
-
-**Headers:**
-- `Authorization`: Bearer token.
-
-**Request Body:**
+#### Bad Request (400 - User Already Exists)
+If a user with the same email address already exists in the system, the response will be a 400 error indicating that the user already exists.
 ```json
 {
-  "addressId": "string"
+    "message": "User with this email already exists"
 }
 ```
 
-**Responses:**
-- `200 OK`: 🏠 Default address set successfully.
-- `404 Not Found`: ❌ User not found.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-### 🖼️ Set Profile Picture
-**PATCH** `/set-profile-picture`  
-Upload a profile picture to personalize your account.
-
-**Headers:**
-- `Authorization`: Bearer token.  
-- `Content-Type`: `multipart/form-data`.
-
-**Request Body:**
-- `image` (file): Profile picture file.
-
-**Responses:**
-- `200 OK`: 🖼️ Profile picture updated successfully.
-- `400 Bad Request`: ⚠️ No image uploaded.
-- `404 Not Found`: ❌ User not found.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-### 🔍 Find Localmate Number
-**GET** `/find-localmate-number`  
-Discover the nearest localmate number.
-
-**Headers:**
-- `Authorization`: Bearer token.
-
-**Responses:**
-- `200 OK`: 📞 Localmate number retrieved successfully.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-### 📲 Send OTP
-**POST** `/sendotp`  
-Receive a one-time password (OTP) on your contact number.
-
-**Responses:**
-- `200 OK`: 📩 OTP sent successfully.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-### ✅ Verify OTP
-**POST** `/verifyotp`  
-Confirm your OTP to proceed.
-
-**Request Body:**
+#### Server Error (500 - Internal Error)
+If an internal error occurs during the registration process (e.g., database issues), the response will be a 500 error with a general error message.
 ```json
 {
-  "contactNumber": "string",
-  "inputOTP": "string"
+    "message": "Detailed error message (for internal debugging)"
 }
 ```
 
-**Responses:**
-- `200 OK`: ✅ OTP verified successfully.
-- `401 Unauthorized`: ❌ Invalid OTP.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
-
----
-
-## 🆘 Help and Support Routes
-
-### 🆘 Create Help Request
-**POST** `/help`  
-Submit a help request for assistance.
-
-**Request Body:**
+### Example Request
+```http
+POST /users/register
+```
+Request Body:
 ```json
 {
-  "userID": "string",
-  "title": "string",
-  "description": "string"
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.1222@example.com",
+    "dob": "1990-01-01",
+    "userType": "Customer",
+    "contactNumber": 9555450842,
+    "password": "hashedPassword123"
 }
 ```
 
-**Responses:**
-- `201 Created`: 🆘 Help request created successfully.
-- `400 Bad Request`: ⚠️ Validation errors.
+### Validation Logic (for internal reference)
+- `firstName` should not be empty.
+- `lastName` should not be empty.
+- `email` must be a valid email.
+- `password` must be at least 6 characters long.
+- `dob` should not be empty and should be in the format YYYY-MM-DD.
+- `userType` should not be empty.
+- `contactNumber` must be a valid mobile phone number.
 
----
+### Error Handling
+- If there are any validation errors (like missing or invalid fields), the system will respond with a 400 status and a list of the error messages.
+- If another user uses the email, the system will respond with a 400 status and the message "User with this email already exists."
+- For unexpected errors (e.g., database errors), the system will respond with a 500 status and a generic error message.
 
-### 📋 Get All Help Requests
-**GET** `/help`  
-View all submitted help requests.
+## Endpoint: POST api/v1/users/login
 
-**Responses:**
-- `200 OK`: 📋 Help requests retrieved successfully.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+### Description
+This endpoint allows a registered user to log in to the application using their email and password. The server will validate the user's credentials, and if successful, a JWT token will be generated and returned for authentication, along with the user details.
 
----
-
-### 🔍 Get Help Request by ID
-**GET** `/help/:id`  
-Retrieve details of a specific help request.
-
-**Responses:**
-- `200 OK`: 🔍 Help request retrieved successfully.
-- `404 Not Found`: ❌ Help request not found.
-
----
-
-### ✏️ Update Help Request
-**PUT** `/help/:id`  
-Modify an existing help request.
-
-**Request Body:**
+### Request Body (JSON)
+The body of the request should contain the following fields:
 ```json
 {
-  "title": "string",
-  "description": "string"
+    "email": "john.1222@example.com",
+    "password": "hashedPassword123"
 }
 ```
 
-**Responses:**
-- `200 OK`: ✏️ Help request updated successfully.
-- `404 Not Found`: ❌ Help request not found.
-- `400 Bad Request`: ⚠️ Validation errors.
+### Validation Rules
+- `email`: Required and must be a valid email format.
+- `password`: Required and must be at least 6 characters long.
 
----
+### Response Codes and Examples
 
-### 🛑 Close Help Request
-**PATCH** `/help/:id`  
-Mark a help request as resolved.
+#### Success (200 - OK)
+If the login is successful, the response will include a JWT token for authentication along with the user's details.
+```json
+{
+    "token": "jwt.token.here",
+    "user": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.1222@example.com",
+        "dob": "1990-01-01",
+        "userType": "Customer",
+        "contactNumber": 9555450842
+    }
+}
+```
 
-**Responses:**
-- `200 OK`: 🛑 Help request closed successfully.
-- `404 Not Found`: ❌ Help request not found.
+#### Bad Request (400 - Validation Error)
+If the email or password fails validation (e.g., invalid format or too short), the response will contain an array of error messages.
+```json
+{
+    "errors": [
+        { "msg": "Invalid Email" },
+        { "msg": "Password must be at least 6 characters long" }
+    ]
+}
+```
 
----
+#### Unauthorized (401 - Invalid Credentials)
+If the email does not match any user or the password is incorrect, the response will indicate an authentication failure.
+```json
+{
+    "message": "Invalid email or password"
+}
+```
 
-### 👤 Get Help Requests by User
-**GET** `/help/users/:userid`  
-View all help requests submitted by a specific user.
+#### Server Error (500 - Internal Error)
+If any internal error occurs during the login process (e.g., database query fails), the response will return a generic error message.
+```json
+{
+    "message": "An error occurred while processing your request."
+}
+```
 
-**Responses:**
-- `200 OK`: 👤 Help requests retrieved successfully.
-- `404 Not Found`: ❌ User not found.
+### Example Request
+```http
+POST /users/login
+```
+Request Body:
+```json
+{
+    "email": "john.1222@example.com",
+    "password": "hashedPassword123"
+}
+```
 
----
+### Validation Logic (for internal reference)
+- `email`: Must be a valid email address (e.g., user@example.com).
+    - Validation: `body('email').isEmail().withMessage('Invalid Email')`
+- `password`: Must be at least 6 characters long.
+    - Validation: `body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')`
 
-## 💰 Price Routes
+## Endpoint: POST api/v1/users/logout
 
-### 💵 Service and Product Price
-**GET** `/service-and-product-price`  
-Calculate the total cost of services and products.
+### Description
+This endpoint allows a user to log out by invalidating their JWT token. When the user logs out, their token is added to a blocked tokens list, preventing it from being used for future requests.
 
-**Query Parameters:**
-- `distance` (number): Distance in kilometers.  
-- `timeTaken` (number): Time taken in minutes.  
-- `videoCallSeconds` (number): Duration of the video call in seconds.
+### Request Headers
+- `Authorization` (required): The JWT token is passed in the Authorization header in the format: `Bearer <token>`
 
-**Responses:**
-- `200 OK`: 💵 Total cost calculated successfully.
-- `400 Bad Request`: ⚠️ Missing or invalid query parameters.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+### Response Codes and Examples
 
----
+#### Success (200 - OK)
+If the logout is successful, the response will confirm the user has logged out.
+```json
+{
+    "message": "Logged out Success"
+}
+```
 
-### ⏳ Capped Time for Information
-**GET** `/capped-time-for-info`  
-Calculate the cost for capped time-based services.
+#### Server Error (500 - Internal Error)
+If any internal error occurs during the logout process, such as issues saving the blocked token, the response will return a generic error message.
+```json
+{
+    "message": "Detailed error message (for internal debugging)"
+}
+```
 
-**Query Parameters:**
-- `timeInSeconds` (number): Time in seconds.
+#### Note
+If the token is already blocked then while authorization it returns:
+```json
+{
+    "message": "Unauthorized"
+}
+```
+## Endpoint: GET api/v1/maps/get-coordinates
 
-**Responses:**
-- `200 OK`: ⏳ Total cost calculated successfully.
-- `400 Bad Request`: ⚠️ Missing or invalid query parameters.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+### Description
+Retrieves latitude and longitude for a given address.
 
----
+### Request Parameters
+- `address` (query, **required**): The location to fetch coordinates for.
 
-### ⏱️ Incremental Time for Information
-**GET** `/capped-time-for-info-incremental`  
-Calculate the cost for incremental time-based services.
+### Responses
 
-**Query Parameters:**
-- `timeInSeconds` (number): Time in seconds.
+#### Success (200 - OK)
+Returns coordinates for the provided address.
+```json
+{
+    "ltd": 28.69508,
+    "lng": 77.45323
+}
+```
 
-**Responses:**
-- `200 OK`: ⏱️ Total cost calculated successfully.
-- `400 Bad Request`: ⚠️ Missing or invalid query parameters.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+#### Bad Request (400 - Validation Error)
+If the address query is missing or empty.
+```json
+{
+    "errors": [
+        {
+            "type": "field",
+            "value": "",
+            "msg": "Invalid value",
+            "path": "address",
+            "location": "query"
+        }
+    ]
+}
+```
 
----
+### Example Request
+```http
+GET /api/v1/maps/get-coordinates?address=ayz
+```
 
-### 🔍 Quick Lookup Cost
-**GET** `/quick-lockup-cost`  
-Calculate the cost for quick lookup services.
+## Endpoint: GET api/v1/maps/get-distance-time
 
-**Query Parameters:**
-- `distance` (number): Distance in kilometers.  
-- `videoCallSeconds` (number): Duration of the video call in seconds.
+### Description
+Calculates the distance and estimated travel time between an origin and a destination.
 
-**Responses:**
-- `200 OK`: 🔍 Total cost calculated successfully.
-- `400 Bad Request`: ⚠️ Missing or invalid query parameters.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+### Request Parameters
+- `origin` (query, **required**): The starting location in `latitude, longitude` format.
+- `destination` (query, **required**): The target location in `latitude ,longitude` format.
 
----
+### Responses
 
-## 🗺️ Map Routes
+#### Success (200 - OK)
+Returns the distance and estimated travel time.
+```json
+{
+    "distance": "100 km",
+    "time": "1h 30m"
+}
+```
 
-### 📍 Get Coordinates
-**GET** `/get-coordinates`  
-Retrieve the coordinates for a given address.
+#### Bad Request (400 - Missing Parameters)
+If origin or destination is missing.
 
-**Headers:**
-- `Authorization`: Bearer token.
+#### Server Error (500 - Internal Error)
+If an internal server error occurs.
+```json
+{
+    "message": "Internal server error"
+}
+```
 
-**Query Parameters:**
-- `address` (string): The address to retrieve coordinates for.
+### Example Request
+```http
+GET /api/v1/maps/get-distance-time?origin=28.69508,77.45323&destination=28.69508,78.45323
+```
 
-**Responses:**
-- `200 OK`: 📍 Coordinates found successfully.
-- `400 Bad Request`: ⚠️ Validation error or missing query parameter.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+## Endpoint: GET api/v1/maps/get-suggestions
 
----
+### Description
+Provides location suggestions based on partial user input.
 
-### 🚗 Get Distance and Time
-**GET** `/get-distance-time`  
-Calculate the distance and time between two locations.
+### Request Parameters
+- `input` (query, **required**): The search term for location suggestions.
 
-**Headers:**
-- `Authorization`: Bearer token.
+### Responses
 
-**Query Parameters:**
-- `origin` (string): The starting location.
-- `destination` (string): The destination location.
+#### Success (200 - OK)
+Returns an array of suggested locations.
+```json
+[
+    "Lucknow, India",
+    "Lucknow, Uttar Pradesh",
+    "Lucknow Cantonment, India"
+]
+```
 
-**Responses:**
-- `200 OK`: 🚗 Distance and time calculated successfully.
-- `400 Bad Request`: ⚠️ Validation error or missing query parameters.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+#### Server Error (500 - Internal Error)
+If an internal server error occurs.
+```json
+{
+    "message": "Internal server error",
+    "err": {}
+}
+```
 
----
+### Example Request
+```http
+GET /api/v1/maps/get-suggestions?input=lucknow
+```
 
-### 🔎 Get AutoComplete Suggestions
-**GET** `/get-suggestions`  
-Get autocomplete suggestions for a given input.
+## Endpoint: GET api/v1/maps/get-active-users-within-radius
 
-**Headers:**
-- `Authorization`: Bearer token.
+### Description
+Fetches a list of active users within a specified radius from a given latitude and longitude.
 
-**Query Parameters:**
-- `input` (string): The input string to get suggestions for.
+### Request Parameters
+- `latitude` (query, **required**): The latitude of the center point.
+- `longitude` (query, **required**): The longitude of the center point.
+- `radius` (query, **required**): The search radius (in meters or kilometers, depending on implementation).
 
-**Responses:**
-- `200 OK`: 🔎 Suggestions retrieved successfully.
-- `400 Bad Request`: ⚠️ Validation error or missing query parameter.
-- `500 Internal Server Error`: ⚠️ Something went wrong.
+### Responses
 
----
+#### Success (200 - OK)
+Returns an array of active users within the given radius.
+```json
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "latitude": 28.7041,
+        "longitude": 77.1025
+    },
+    {
+        "id": 2,
+        "name": "Jane Smith",
+        "latitude": 28.7055,
+        "longitude": 77.1030
+    }
+]
+```
 
-### 🌍 Get Active Users Within Radius
-**GET** `/get-active-users-within-radius`  
-Find active users near a specific location.
+#### Server Error (500 - Internal Error)
+If an internal server error occurs.
 
-**Headers:**
-- `Authorization`: Bearer token.
-
-**Query Parameters:**
-- `latitude` (number): Latitude of the location.
-- `longitude` (number): Longitude of the location.
-- `radius` (number): Radius in kilometers.
-
-**Responses:**
-- `200 OK`: 🌍 Active users found successfully.
-- `400 Bad Request`: ⚠️ Validation error or missing query parameters.
-- `500 Internal Server Error`: ⚠️ Something went wrong.

@@ -5,7 +5,6 @@ import {
   calculateQuickLookupCost,
 } from "../services/price.service.js";
 import { dynamicPrices } from "../config/dynamicPrice.js";
-
 const serviceAndProductPrice = async (req, res) => {
   try {
     // Destructure and validate query parameters

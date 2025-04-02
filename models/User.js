@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: () => new mongoose.Types.ObjectId(),
-    unique: true,
-  }, // It is use to Expose the user id to the user
   firstName: {
     type: String,
     required: [true, "First name is required"],
@@ -27,7 +22,7 @@ const userSchema = new mongoose.Schema({
   userType: {
     type: String,
     required: [true, "User type is required"],
-    enum: ["Customer", "Localmate"],
+    enum: ["Admin", "Customer", "Localmate"],
     default: "Customer",
   },
   contactNumber: {
@@ -54,19 +49,9 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
   fevServices: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "",
-    unique: true,
+    type: [String],
   },
   feadback: {
-    type: String,
-  },
-  defaultAddress: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "UserAddress",
-    require: false,
-  },
-  userPFP: {
     type: String,
   },
 });
