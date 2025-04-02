@@ -8,7 +8,7 @@ export const addUserAddress = async (req, res) => {
   try {
     const { userId, address } = req.body;
 
-      if (!userId || !address) {
+    if (!userId || !address) {
       return res
         .status(400)
         .json(createResponse(false, "userId and address are required"));
@@ -25,8 +25,6 @@ export const addUserAddress = async (req, res) => {
       address,
       coordinates,
     });
-    
-    const newAddress = await UserAddress.create({ userId, address });
 
     res
       .status(201)
