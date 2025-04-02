@@ -1,54 +1,34 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const orderSchema = new mongoose.Schema(
-  {
-    customerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+const orderSchema = new mongoose.Schema({
+    orderId: {
+        type: String,
+        default: () => new mongoose.Types.ObjectId().toString(),
+        unique: true
     },
-    localmateId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    customerId: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+        required: true
+    },
+    partnerId: {
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User', 
+        required: true
+    },
+    orderDetailId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'OrderDetail',
+        required: true
     },
     status: {
-      type: String,
-      enum: ["Pending", "Accepted", "Ongoing", "Completed", "Cancelled"],
-      required: true,
-      default: "Pending",
-    },
-    fare: {
-      type: Number,
-      required: true,
-    },
-    deliverdAt: {
-      type: Date,
-    },
-    orderAt: {
-      type: Date,
-      default: Date.now,
-    },
-    category: [
-      {
         type: String,
-        enum: [
-          "Shopping and product delivery",
-          "Information",
-          "Quick check",
-          "Services",
-        ],
-        required: true,
-      },
-    ],
-    description: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+        enum: ["Completed", "Ongoing", "Cancelled"],
+        required: true
+    }
+});
 
-const Order = mongoose.model("Order", orderSchema);
+
+const Order = mongoose.model('Order', orderSchema);
 
 export default Order;

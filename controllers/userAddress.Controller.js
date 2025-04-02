@@ -1,12 +1,14 @@
 import UserAddress from "../models/UserAddress.js";
-import { createResponse } from "../utils/helpers.js";
-import { getAddressCoordinate } from "../services/maps.service.js";
+
+const createResponse = (status, message, data = null) => {
+  return { status, message, data };
+};
 
 export const addUserAddress = async (req, res) => {
   try {
     const { userId, address } = req.body;
 
-    if (!userId || !address) {
+      if (!userId || !address) {
       return res
         .status(400)
         .json(createResponse(false, "userId and address are required"));
@@ -23,6 +25,9 @@ export const addUserAddress = async (req, res) => {
       address,
       coordinates,
     });
+    
+    const newAddress = await UserAddress.create({ userId, address });
+
     res
       .status(201)
       .json(createResponse(true, "Address added successfully", newAddress));
@@ -54,15 +59,10 @@ export const updateUserAddress = async (req, res) => {
         .status(400)
         .json(createResponse(false, "userId and address are required"));
     }
-    const coordinates = await getAddressCoordinate(address);
-    if (!coordinates) {
-      return res
-        .status(400)
-        .json(createResponse(false, "Coordinates not found"));
-    }
+
     const result = await UserAddress.updateOne(
       { userId: userId },
-      { $set: { address: address, coordinates: coordinates } }
+      { $set: { address: address } }
     );
 
     if (result.nModified === 0) {

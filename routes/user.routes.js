@@ -3,8 +3,6 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-  setDefaultAddress,
-  setUserPFP,
 } from "../controllers/user.Controller.js";
 import { createOrder, getOrder } from "../controllers/order.Controller.js";
 import {
@@ -12,10 +10,10 @@ import {
   getUserAddresses,
   updateUserAddress,
 } from "../controllers/userAddress.Controller.js";
-// import {
-//   createPayment,
-//   getPayment,
-// } from "../controllers/payment.Controller.js";
+import {
+  createPayment,
+  getPayment,
+} from "../controllers/payment.Controller.js";
 import {
   updateOrderStatus,
   getOrdersByStatus,
@@ -28,8 +26,7 @@ import {
 } from "../services/validation.service.js";
 import { submitRating } from "../controllers/user.Controller.js";
 import { sendotp, verifyotp } from "../controllers/whatsapp.controller.js";
-import upload from "../config/multerConfig.js";
-import { findNearLocalmateNumber } from "../controllers/localmate.controller.js";
+
 const router = express.Router();
 
 // Public routes (no auth required)
@@ -49,16 +46,9 @@ router.get("/address/:userId", authUser, checkBanStatus, getUserAddresses);
 router.patch("/address/:userId", authUser, checkBanStatus, updateUserAddress);
 
 // Payment routes
-// router.post("/payment", authUser, checkBanStatus, createPayment);
-// router.get("/payment/:paymentId", authUser, checkBanStatus, getPayment);
+router.post("/payment", authUser, checkBanStatus, createPayment);
+router.get("/payment/:paymentId", authUser, checkBanStatus, getPayment);
 
-// Default address route
-router.patch(
-  "/address/:userId/default",
-  authUser,
-  checkBanStatus,
-  setDefaultAddress
-);
 // Status routes
 router.patch(
   "/order/:orderId/status",
@@ -74,15 +64,4 @@ router.post("/rating", authUser, checkBanStatus, validateRating, submitRating);
 // WhatsApp OTP routes
 router.post("/sendotp", sendotp);
 router.post("/verifyotp", verifyotp);
-
-// set PFP route
-router.patch(
-  "/set-profile-picture", // Change this to "/set-profile-picture"
-  upload.single("image"),
-  authUser,
-  setUserPFP
-);
-
-// localmate route
-router.get("/find-localmate-number", authUser, findNearLocalmateNumber);
 export default router;

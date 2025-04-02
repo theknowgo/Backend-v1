@@ -56,16 +56,7 @@ const userSchema = new mongoose.Schema(
       default: "inactive",
     },
   },
-  { timestamps: true }
 );
-
-userSchema.methods.generateAuthToken = function () {
-  return jwt.sign(
-    { _id: this._id, userType: this.userType },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-  );
-};
 
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign(
