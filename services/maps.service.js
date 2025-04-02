@@ -1,5 +1,6 @@
 import axios from "axios";
 import User from "../models/User.js";
+import { getNearbyKeys } from "../config/redisConfig.js";
 
 export const getAddressCoordinate = async (address) => {
   const apiKey = process.env.OLA_MAPS_API;
@@ -83,19 +84,50 @@ export const getAddressDistanceTime = async (origin, destination) => {
   }
 };
 
-export const getActiveUsers = async (latitude, longitude, radius) => {
+const getNearbyLocalmates = async (latitude, longitude, radiusInMeters) => {
   try {
+    // Get nearby localmates within the given radius
+    const nearbyKeys = await getNearbyKeys(longitude, latitude, radiusInMeters);
+
+    if (!nearbyKeys.length) return [];
+
+    // Extract localmate IDs and phone numbers
+    const localmates = nearbyKeys.map((item) => {
+      const [localmateId, phoneNumber] = item.member.split(":").slice(1); // Extract from key
+      return {
+        localmateId,
+        phoneNumber,
+        latitude: item.coordinates.latitude,
+        longitude: item.coordinates.longitude,
+      };
+    });
+
+    return localmates;
+  } catch (error) {
+    console.error("❌ Error fetching nearby localmates:", error);
+    throw error;
+  }
+};
+
+export const getActiveUsers = async (latitude, longitude, radiusInMeters) => {
+  try {
+    const localmates = await getNearbyLocalmates(
+      latitude,
+      longitude,
+      radiusInMeters
+    );
+
+    if (!localmates.length) return [];
+
+    // Fetch details from MongoDB using phone numbers
     const users = await User.find(
       {
-        location: {
-          $geoWithin: {
-            $centerSphere: [[longitude, latitude], radius / 6378.1],
-          },
-        },
+        phoneNumber: { $in: localmates.map((lm) => lm.phoneNumber) },
         status: "active",
       },
-      { _id: 1, name: 1, location: 1 }
+      { _id: 1, name: 1, phoneNumber: 1, location: 1 }
     ).lean();
+
     return users;
   } catch (error) {
     console.error("Error fetching active users:", error);

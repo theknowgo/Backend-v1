@@ -18,9 +18,10 @@ import userRoutes from "./routes/user.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import mapRoutes from "./routes/maps.routes.js";
 import priceRoutes from "./routes/price.routes.js";
-import chatsRoutes from "./routes/chats.routes.js";
-import logRoutes from "./routes/logRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js"; // New admin routes
+import chatsRoutes from "./routes/chats.routes.js"; // Corrected import
+import helpRoutes from "./routes/help.routes.js";
+import logRoutes from "./routes/logRoutes.js"; // Added log routes
+import adminRoutes from "./routes/adminRoutes.js"; // Added admin routes
 
 const app = express();
 
@@ -46,14 +47,15 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
-app.use("/api/v1/users",  userRoutes); // Protect user routes
-app.use("/api/v1/auth", authUser, checkBanStatus, authRoutes); // Protect auth routes
-app.use("/api/v1/maps", authUser, checkBanStatus, mapRoutes); // Protect map routes
-app.use("/api/v1/prices", authUser, checkBanStatus, priceRoutes); // Protect price routes
-app.use("/api/v1/chats", authUser, checkBanStatus, chatsRoutes); // Protect chat routes
-app.use("/api/v1/admin", authUser, checkBanStatus, isAdmin, adminRoutes); // Protect admin routes with admin check
-app.use("/api/v1/logs", authUser, checkBanStatus, logRoutes); // Protect log routes (renamed for clarity)
+// Routes with proper route protection (authUser, checkBanStatus, isAdmin)
+app.use("/api/v1/users", userRoutes); // User routes (protected)
+app.use("/api/v1/auth", authUser, checkBanStatus, authRoutes); // Auth routes (protected)
+app.use("/api/v1/maps", authUser, checkBanStatus, mapRoutes); // Map routes (protected)
+app.use("/api/v1/prices", authUser, checkBanStatus, priceRoutes); // Price routes (protected)
+app.use("/api/v1/chats", authUser, checkBanStatus, chatsRoutes); // Chat routes (protected)
+app.use("/api/v1/help", helpRoutes); // Help routes (no protection needed)
+app.use("/api/v1/admin", authUser, checkBanStatus, isAdmin, adminRoutes); // Admin routes (protected with admin check)
+app.use("/api/v1/logs", authUser, checkBanStatus, logRoutes); // Log routes (protected)
 
 // 404 Error Handler
 app.use("*", (req, res) => {

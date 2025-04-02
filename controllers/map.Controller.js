@@ -54,6 +54,13 @@ export const getDistanceTime = async (req, res) => {
 export const getActiveUsersWithinRadius = async (req, res) => {
   try {
     const { latitude, longitude, radius } = req.query;
+    if (!latitude || !longitude || !radius) {
+      return res
+        .status(400)
+        .json(
+          createResponse(false, "Latitude, longitude, and radius are required")
+        );
+    }
     const activeUsers = await getActiveUsers(latitude, longitude, radius);
     res
       .status(200)

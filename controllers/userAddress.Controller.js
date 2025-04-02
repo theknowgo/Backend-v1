@@ -7,7 +7,27 @@ const createResponse = (status, message, data = null) => {
 export const addUserAddress = async (req, res) => {
   try {
     const { userId, address } = req.body;
+
+      if (!userId || !address) {
+      return res
+        .status(400)
+        .json(createResponse(false, "userId and address are required"));
+    }
+
+    const coordinates = await getAddressCoordinate(address);
+    if (!coordinates) {
+      return res
+        .status(400)
+        .json(createResponse(false, "Coordinates not found"));
+    }
+    const newAddress = await UserAddress.create({
+      userId,
+      address,
+      coordinates,
+    });
+    
     const newAddress = await UserAddress.create({ userId, address });
+
     res
       .status(201)
       .json(createResponse(true, "Address added successfully", newAddress));

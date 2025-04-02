@@ -1,60 +1,62 @@
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: [true, "First name is required"],
-    trim: true,
-    minlength: [2, "First name must be at least 2 characters long"],
-    maxlength: [50, "First name must be less than 50 characters long"],
-  },
-  lastName: {
-    type: String,
-    trim: true,
-    maxlength: [50, "Last name must be less than 50 characters long"],
-  },
-  is18plus: {
-    type: Boolean,
-    required: [true, "Age is required"],
-    default: false,
-  },
-  userType: {
-    type: String,
-    required: [true, "User type is required"],
-    enum: ["Admin", "Customer", "Localmate"],
-    default: "Customer",
-  },
-  contactNumber: {
-    type: Number,
-    required: [true, "Contact number is required"],
-    validate: {
-      validator: function (v) {
-        return /^[6-9]\d{9}$/.test(v.toString());
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 50,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+      maxlength: 50,
+    },
+    is18plus: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    userType: {
+      type: String,
+      enum: ["Customer", "Localmate"],
+      required: true,
+    },
+    contactNumber: {
+      type: String, // Changed from Number to String
+      required: true,
+      unique: true,
+      validate: {
+        validator: (v) => /^[6-9]\d{9}$/.test(v),
+        message: (props) =>
+          `${props.value} is not a valid Indian contact number!`,
       },
-      message: (props) =>
-        `${props.value} is not a valid Indian contact number!`,
+    },
+    banCount: { type: Number, default: 0 },
+    banExpiration: { type: Date, default: null },
+    isPermanentlyBanned: { type: Boolean, default: false },
+    fevServices: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Service",
+      },
+    ],
+    feedback: { type: String },
+    defaultAddress: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserAddress",
+    },
+    userPFP: { type: String },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "online"],
+      default: "inactive",
     },
   },
-  banCount: {
-    type: Number,
-    default: 0,
-  },
-  banExpiration: {
-    type: Date,
-    default: null,
-  },
-  isPermanentlyBanned: {
-    type: Boolean,
-    default: false,
-  },
-  fevServices: {
-    type: [String],
-  },
-  feadback: {
-    type: String,
-  },
-});
+);
 
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign(
