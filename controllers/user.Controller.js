@@ -23,14 +23,14 @@ export const registerUser = async (req, res) => {
     inputOTP,
   } = req.body;
 
-  if (!verifyHashedOTP(inputOTP, hashedOTP)) {
-    return res.status(401).json(createResponse(false, "Invalid OTP"));
-  }
-
   if (await checkUserExistsByNumber(contactNumber)) {
     return res
       .status(400)
       .json(createResponse(false, "User with this number already exists"));
+  }
+
+  if (!verifyHashedOTP(inputOTP, hashedOTP)) {
+    return res.status(401).json(createResponse(false, "Invalid OTP"));
   }
 
   try {
@@ -56,20 +56,22 @@ export const loginUser = async (req, res) => {
   if (handleValidationErrors(req, res)) return;
 
   const { contactNumber, hashedOTP, inputOTP } = req.body;
-  if (!verifyHashedOTP(inputOTP, hashedOTP)) {
-    return res.status(401).json(createResponse(false, "Invalid OTP"));
-  }
+
   const user = await checkUserExistsByNumber(contactNumber);
   if (!user) {
     return res
       .status(401)
-      .json(createResponse(false, "User with this number does not exist"));
+      .json(createResponse(false, "Invalid contact number"));
   }
 
   if (user.isPermanentlyBanned) {
     return res
       .status(403)
       .json(createResponse(false, "Your account has been permanently banned"));
+  }
+
+  if (!verifyHashedOTP(inputOTP, hashedOTP)) {
+    return res.status(401).json(createResponse(false, "Invalid OTP"));
   }
 
   if (user.banExpiration && new Date() < user.banExpiration) {
@@ -151,47 +153,6 @@ export const submitRating = async (req, res) => {
     }
 
     res.status(200).json(createResponse(true, "Rating submitted successfully"));
-  } catch (error) {
-    res.status(500).json(createResponse(false, error.message));
-  }
-};
-
-// Set Default Address
-export const setDefaultAddress = async (req, res) => {
-  try {
-    const { addressId } = req.body;
-
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json(createResponse(false, "User not found"));
-    }
-
-    user.defaultAddress = addressId;
-    await user.save();
-    return res
-      .status(200)
-      .json(createResponse(true, "Default address set successfully"));
-  } catch (error) {
-    res.status(500).json(createResponse(false, error.message));
-  }
-};
-
-//setUser PFP
-export const setUserPFP = async (req, res) => {
-  try {
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-    if (!imageUrl) {
-      return res.status(400).json(createResponse(false, "No image uploaded"));
-    }
-
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json(createResponse(false, "User not found"));
-    }
-
-    user.userPFP = imageUrl;
-    await user.save();
-    return res.status(200).json(createResponse(true, "PFP set successfully"));
   } catch (error) {
     res.status(500).json(createResponse(false, error.message));
   }
