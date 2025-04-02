@@ -1,30 +1,24 @@
 import Order from "../models/Order.js";
-import OrderDetail from "../models/OrderDetail.js";
-import User from "../models/User.js";
 import { createResponse } from "../utils/helpers.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { customerId, orderDetail, status } = req.body;
+    const { customerId, category, description, fare, localmateId } = req.body;
 
-    const newOrderDetail = await OrderDetail.create(orderDetail);
-    const partner = await User.findOne({ userType: "Partner" }).sort({
-      createdAt: 1,
-    });
-
-    if (!partner) {
+    const { error } = validateOrder(req.body);
+    if (error) {
       return res
-        .status(404)
-        .json(
-          createResponse(false, "No partners available at the moment", null)
-        );
+        .status(400)
+        .json(createResponse(false, error.details[0].message, null));
     }
 
     const newOrder = await Order.create({
       customerId,
-      partnerId: partner._id,
-      orderDetailId: newOrderDetail._id,
-      status,
+      category,
+      description,
+      fare,
+      localmateId,
+      status: "Pending",
     });
 
     res

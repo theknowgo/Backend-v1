@@ -1,11 +1,6 @@
 import mongoose from "mongoose";
 
 const orderDetailSchema = new mongoose.Schema({
-  odId: {
-    type: String,
-    default: () => new mongoose.Types.ObjectId().toString(),
-    unique: true,
-  },
   startLocation: {
     type: String,
     required: true,
@@ -27,10 +22,6 @@ const orderDetailSchema = new mongoose.Schema({
     },
   ],
   description: {
-    type: String,
-    required: true,
-  },
-  situation: {
     type: String,
     required: true,
   },

@@ -5,6 +5,13 @@ import { getAddressCoordinate } from "../services/maps.service.js";
 export const addUserAddress = async (req, res) => {
   try {
     const { userId, address } = req.body;
+
+    if (!userId || !address) {
+      return res
+        .status(400)
+        .json(createResponse(false, "userId and address are required"));
+    }
+
     const coordinates = await getAddressCoordinate(address);
     if (!coordinates) {
       return res

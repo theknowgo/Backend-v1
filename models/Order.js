@@ -7,14 +7,9 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    partnerId: {
+    localmateId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
-    },
-    orderDetailId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "OrderDetail",
       required: true,
     },
     status: {
@@ -22,6 +17,33 @@ const orderSchema = new mongoose.Schema(
       enum: ["Pending", "Accepted", "Ongoing", "Completed", "Cancelled"],
       required: true,
       default: "Pending",
+    },
+    fare: {
+      type: Number,
+      required: true,
+    },
+    deliverdAt: {
+      type: Date,
+    },
+    orderAt: {
+      type: Date,
+      default: Date.now,
+    },
+    category: [
+      {
+        type: String,
+        enum: [
+          "Shopping and product delivery",
+          "Information",
+          "Quick check",
+          "Services",
+        ],
+        required: true,
+      },
+    ],
+    description: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

@@ -28,6 +28,7 @@ export const findNearLocalmateNumber = async (req, res) => {
       { $sort: { distance: 1 } },
       { $limit: 2 },
     ]);
+    
     const result = localmates.map((mate) => ({
       name: mate.firstName + " " + mate.lastName,
       contactNumber: mate.contactNumber,
