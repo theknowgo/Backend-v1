@@ -82,9 +82,13 @@ export const loginUser = async (req, res) => {
     }
 
     const token = user.generateAuthToken();
-    return res
-      .status(200)
-      .json(createResponse(true, "User login successfully", { user, token }));
+    return res.status(200).json(
+      createResponse(true, "User login successfully", {
+        user,
+        token,
+        isNewUser: false,
+      })
+    );
   } else {
     if (userType !== "Customer") {
       return res
@@ -97,11 +101,13 @@ export const loginUser = async (req, res) => {
       });
 
       const token = user.generateAuthToken();
-      return res
-        .status(201)
-        .json(
-          createResponse(true, "User created successfully", { user, token })
-        );
+      return res.status(201).json(
+        createResponse(true, "User created successfully", {
+          user,
+          token,
+          isNewUser: true,
+        })
+      );
     } catch (error) {
       return res.status(400).json(createResponse(false, error.message));
     }

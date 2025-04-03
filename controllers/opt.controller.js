@@ -23,7 +23,10 @@ export const sendotp = async (req, res) => {
         .json(createResponse(false, response.message || "Failed to send OTP"));
     }
 
-    res.json(createResponse(true, "OTP sent successfully!"));
+    // res.json(createResponse(true, "OTP sent successfully!"));
+    res.json(
+      createResponse(true, response.message || "OTP sent successfully!")
+    );
   } catch (error) {
     console.error("Error in sendotp:", error);
     res.status(500).json(createResponse(false, "Internal server error!"));
