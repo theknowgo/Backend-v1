@@ -11,14 +11,12 @@ export const sendotp = async (req, res) => {
     }
 
     const phone = contactNumber.trim();
-
     if (!/^\+?[0-9]{10,15}$/.test(phone)) {
       return res
         .status(400)
         .json(createResponse(false, "Invalid phone number format!"));
     }
-    console.log("contactNumber", contactNumber, phone);
-    const response = await sendOTP(contactNumber);
+    const response = await sendOTP(phone);
     if (!response.success) {
       return res
         .status(500)

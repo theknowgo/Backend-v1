@@ -7,7 +7,7 @@ import { createUser } from "../services/user.service.js";
 import BlockedToken from "../models/blockedTokken.js";
 import User from "../models/User.js";
 import Rating from "../models/rating.js";
-import { verifyHashedOTP } from "../services/otp.service.js";
+import { verifyOTP } from "../services/otp.service.js";
 
 // Register User
 export const registerUser = async (req, res) => {
@@ -55,37 +55,57 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   if (handleValidationErrors(req, res)) return;
 
-  const { contactNumber, hashedOTP, inputOTP } = req.body;
+  const { contactNumber, inputOTP, userType } = req.body;
 
-  const user = await checkUserExistsByNumber(contactNumber);
-  if (!user) {
-    return res
-      .status(401)
-      .json(createResponse(false, "Invalid contact number"));
-  }
-
-  if (user.isPermanentlyBanned) {
-    return res
-      .status(403)
-      .json(createResponse(false, "Your account has been permanently banned"));
-  }
-
-  if (!verifyHashedOTP(inputOTP, hashedOTP)) {
+  const isVerified = await verifyOTP(contactNumber, inputOTP);
+  if (!isVerified) {
     return res.status(401).json(createResponse(false, "Invalid OTP"));
   }
 
-  if (user.banExpiration && new Date() < user.banExpiration) {
-    return res.status(403).json(
-      createResponse(false, "Your account is temporarily banned", {
-        banExpiration: user.banExpiration,
-      })
-    );
-  }
+  const user = await checkUserExistsByNumber(contactNumber);
 
-  const token = user.generateAuthToken();
-  return res
-    .status(200)
-    .json(createResponse(true, "User login successfully", { user, token }));
+  if (user) {
+    if (user.isPermanentlyBanned) {
+      return res
+        .status(403)
+        .json(
+          createResponse(false, "Your account has been permanently banned")
+        );
+    }
+
+    if (user.banExpiration && new Date() < user.banExpiration) {
+      return res.status(403).json(
+        createResponse(false, "Your account is temporarily banned", {
+          banExpiration: user.banExpiration,
+        })
+      );
+    }
+
+    const token = user.generateAuthToken();
+    return res
+      .status(200)
+      .json(createResponse(true, "User login successfully", { user, token }));
+  } else {
+    if (userType !== "Customer") {
+      return res
+        .status(400)
+        .json(createResponse(false, "Localmate not found with this number"));
+    }
+    try {
+      const user = await User.create({
+        contactNumber,
+      });
+
+      const token = user.generateAuthToken();
+      return res
+        .status(201)
+        .json(
+          createResponse(true, "User created successfully", { user, token })
+        );
+    } catch (error) {
+      return res.status(400).json(createResponse(false, error.message));
+    }
+  }
 };
 
 // Logout User

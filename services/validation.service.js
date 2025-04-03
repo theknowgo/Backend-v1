@@ -20,7 +20,6 @@ export const validateUserLogin = [
     .withMessage("Contact number is required")
     .matches(/^[6-9]\d{9}$/)
     .withMessage("Contact number must be a valid Indian mobile number"),
-  body("hashedOTP").notEmpty().withMessage("Hashed OTP is required"),
   body("inputOTP").notEmpty().withMessage("OTP is required"),
 ];
 
