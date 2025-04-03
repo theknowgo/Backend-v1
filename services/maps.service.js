@@ -1,6 +1,6 @@
 import axios from "axios";
 import User from "../models/User.js";
-import { getNearbyKeys } from "../config/redisConfig.js";
+// import { getNearbyKeys } from "../config/redisConfig.js";
 
 export const getAddressCoordinate = async (address) => {
   const apiKey = process.env.OLA_MAPS_API;

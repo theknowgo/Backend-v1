@@ -25,7 +25,7 @@ import {
   validateRating,
 } from "../services/validation.service.js";
 import { submitRating } from "../controllers/user.Controller.js";
-import { sendotp, verifyotp } from "../controllers/whatsapp.controller.js";
+import { sendotp, verifyotp } from "../controllers/opt.controller.js";
 
 const router = express.Router();
 
