@@ -30,7 +30,6 @@ import { sendotp, verifyotp } from "../controllers/opt.controller.js";
 const router = express.Router();
 
 // Public routes (no auth required)
-router.post("/register", validateUserRegistration, registerUser);
 router.post("/login", validateUserLogin, loginUser);
 
 // Protected routes (require authentication and ban check)

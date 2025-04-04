@@ -67,3 +67,4 @@
 ::1 - - [03/Apr/2025:15:44:42 +0000] "POST /api/v1/users/login HTTP/1.1" 400 77 "-" "PostmanRuntime/7.43.3"
 ::1 - - [03/Apr/2025:15:45:38 +0000] "POST /api/v1/users/sendotp HTTP/1.1" 200 62 "-" "PostmanRuntime/7.43.3"
 ::1 - - [03/Apr/2025:15:45:48 +0000] "POST /api/v1/users/login HTTP/1.1" 200 777 "-" "PostmanRuntime/7.43.3"
+::1 - - [03/Apr/2025:16:21:15 +0000] "POST /api/v1/users/sendotp HTTP/1.1" 200 80 "-" "PostmanRuntime/7.43.3"
