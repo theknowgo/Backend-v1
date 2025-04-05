@@ -14,6 +14,7 @@ const sendOtp = async (credential, otp) => {
     from: process.env.TWILIO_PHONE_NUMBER,
     to: `+91${credential}`,
   });
+  console.log("OTP sent successfully to", credential);
 };
 
 export default sendOtp;
