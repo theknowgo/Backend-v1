@@ -1,5 +1,5 @@
 import express from "express";
-import { loginUser, logoutUser } from "../controllers/user.Controller.js";
+import userController from "../controllers/user.Controller.js";
 import { createOrder, getOrder } from "../controllers/order.Controller.js";
 import {
   addUserAddress,
@@ -16,7 +16,6 @@ import {
 } from "../controllers/status.Controller.js";
 import { authUser, checkBanStatus } from "../middlewares/authMiddleware.js";
 import {
-  validateUserRegistration,
   validateUserLogin,
   validateRating,
 } from "../services/validation.service.js";
@@ -26,10 +25,13 @@ import { sendotp, verifyotp } from "../controllers/opt.controller.js";
 const router = express.Router();
 
 // Public routes (no auth required)
-router.post("/login", validateUserLogin, loginUser);
+router.post("/login", validateUserLogin, userController.loginUser);
 
 // Protected routes (require authentication and ban check)
-router.get("/logout", authUser, logoutUser);
+router.get("/logout", authUser, userController.logoutUser);
+
+// User routes
+router.patch("/name/:id", authUser, userController.updateUserDetails);
 
 // Order routes
 router.post("/order", authUser, checkBanStatus, createOrder);
