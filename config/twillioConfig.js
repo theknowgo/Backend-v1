@@ -9,12 +9,14 @@ const client = twilio(
 );
 
 const sendOtp = async (credential, otp) => {
-  await client.messages.create({
-    body: `Your OTP is ${otp}. It will expire in 2 minutes.`,
-    from: process.env.TWILIO_PHONE_NUMBER,
-    to: `+91${credential}`,
-  });
-  console.log("OTP sent successfully to", credential);
+  await client.messages
+    .create({
+      body: `Your OTP is ${otp}. It will expire in 2 minutes.`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: `+91${credential}`,
+    })
+    .then((message) => console.log("OTP sent, SID:", message.sid))
+    .catch((error) => console.error("Error sending OTP:", error));
 };
 
 export default sendOtp;
