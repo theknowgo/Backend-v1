@@ -1,12 +1,9 @@
 import crypto from "crypto";
-import { sendWhatsAppMessage } from "../config/whatsappMessage.js";
 import client from "../config/redisConfig.js"; // Redis client
-
-const otpStore = new Map(); // In-memory store for OTPs (for demonstration purposes)
+import sendOtp from "../config/twillioConfig.js"; // Twilio client
 const storeOTP = async (phoneNumber, otp) => {
   try {
-    // await client.setEx(`loginotp:${phoneNumber}`, 120, otp); // Store OTP in Redis with 2 min expiration
-    otpStore.set(phoneNumber, otp); // Store OTP in in-memory store
+    await client.setEx(`loginotp:${phoneNumber}`, 120, otp); // Store OTP in Redis with 2 min expiration
     console.log(`✅ OTP stored for ${phoneNumber}`);
   } catch (error) {
     console.error("❌ Error storing OTP:", error);
@@ -15,8 +12,7 @@ const storeOTP = async (phoneNumber, otp) => {
 
 export const verifyOTP = async (phoneNumber, otp) => {
   try {
-    // const storedOTP = await client.get(`loginotp:${phoneNumber}`); // Get OTP from Redis
-    const storedOTP = otpStore.get(phoneNumber); // Get OTP from in-memory store
+    const storedOTP = await client.get(`loginotp:${phoneNumber}`); // Get OTP from Redis
     if (!storedOTP) {
       console.log(`OTP expired or not found for ${phoneNumber}`);
       return false;
@@ -42,11 +38,9 @@ export const generateOTP = () => {
 
 export const sendOTP = async (phone) => {
   try {
-    console.log("Sending OTP to", phone);
     const otp = await generateAndStoreOTP(phone);
-    const body = `Your OTP is ${otp}. It will expire in 2 minutes.`;
-    // await sendWhatsAppMessage(phone, body);
-    console.log("OTP sent to", phone, body);
+    sendOtp(phone, otp); // Send OTP using Twilio
+    console.log("OTP sent to", phone);
 
     return {
       success: true,
@@ -62,11 +56,3 @@ const generateAndStoreOTP = async (phone) => {
   await storeOTP(phone, otp); // Store OTP in Redis with 2 min expiration
   return otp;
 };
-
-// export const verifyOTP = (phone, otp) => {
-//   if (otpStore.has(phone) && otpStore.get(phone) === otp) {
-//     otpStore.delete(phone); // Remove OTP after verification
-//     return { success: true, message: "OTP verified successfully!" };
-//   }
-//   return { success: false, message: "Invalid or expired OTP!" };
-// };

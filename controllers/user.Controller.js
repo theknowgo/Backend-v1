@@ -10,7 +10,6 @@ import Rating from "../models/rating.js";
 import { verifyOTP } from "../services/otp.service.js";
 import client from "../config/redisConfig.js"; // Redis client
 
-
 // Login User
 export const loginUser = async (req, res) => {
   if (handleValidationErrors(req, res)) return;

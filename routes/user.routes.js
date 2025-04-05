@@ -1,9 +1,5 @@
 import express from "express";
-import {
-  registerUser,
-  loginUser,
-  logoutUser,
-} from "../controllers/user.Controller.js";
+import { loginUser, logoutUser } from "../controllers/user.Controller.js";
 import { createOrder, getOrder } from "../controllers/order.Controller.js";
 import {
   addUserAddress,
@@ -33,7 +29,7 @@ const router = express.Router();
 router.post("/login", validateUserLogin, loginUser);
 
 // Protected routes (require authentication and ban check)
-router.get("/logout", authUser, checkBanStatus, logoutUser);
+router.get("/logout", authUser, logoutUser);
 
 // Order routes
 router.post("/order", authUser, checkBanStatus, createOrder);
