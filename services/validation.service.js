@@ -21,6 +21,9 @@ export const validateUserLogin = [
     .matches(/^[6-9]\d{9}$/)
     .withMessage("Contact number must be a valid Indian mobile number"),
   body("inputOTP").notEmpty().withMessage("OTP is required"),
+  body("userType")
+    .isIn(["Localmate", "Customer"])
+    .withMessage("Invalid user type"),
 ];
 
 export const validateRating = [

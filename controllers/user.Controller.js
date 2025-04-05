@@ -8,48 +8,7 @@ import BlockedToken from "../models/blockedTokken.js";
 import User from "../models/User.js";
 import Rating from "../models/rating.js";
 import { verifyOTP } from "../services/otp.service.js";
-
-// Register User
-export const registerUser = async (req, res) => {
-  if (handleValidationErrors(req, res)) return;
-
-  const {
-    firstName,
-    lastName,
-    is18plus,
-    userType,
-    contactNumber,
-    hashedOTP,
-    inputOTP,
-  } = req.body;
-
-  if (await checkUserExistsByNumber(contactNumber)) {
-    return res
-      .status(400)
-      .json(createResponse(false, "User with this number already exists"));
-  }
-
-  if (!verifyHashedOTP(inputOTP, hashedOTP)) {
-    return res.status(401).json(createResponse(false, "Invalid OTP"));
-  }
-
-  try {
-    const user = await createUser({
-      firstName,
-      lastName,
-      is18plus,
-      userType,
-      contactNumber,
-    });
-
-    const token = user.generateAuthToken();
-    return res
-      .status(201)
-      .json(createResponse(true, "User created successfully", { user, token }));
-  } catch (error) {
-    res.status(400).json(createResponse(false, error.message));
-  }
-};
+import client from "../config/redisConfig.js"; // Redis client
 
 // Login User
 export const loginUser = async (req, res) => {
@@ -57,12 +16,11 @@ export const loginUser = async (req, res) => {
 
   const { contactNumber, inputOTP, userType } = req.body;
 
-  const isVerified = await verifyOTP(contactNumber, inputOTP);
-  if (!isVerified) {
+  if (!(await verifyOTP(contactNumber, inputOTP))) {
     return res.status(401).json(createResponse(false, "Invalid OTP"));
   }
 
-  const user = await checkUserExistsByNumber(contactNumber);
+  let user = await User.findOne({ contactNumber });
 
   if (user) {
     if (user.isPermanentlyBanned) {
@@ -95,11 +53,9 @@ export const loginUser = async (req, res) => {
         .status(400)
         .json(createResponse(false, "Localmate not found with this number"));
     }
-    try {
-      const user = await User.create({
-        contactNumber,
-      });
 
+    try {
+      user = await User.create({ contactNumber });
       const token = user.generateAuthToken();
       return res.status(201).json(
         createResponse(true, "User created successfully", {
@@ -117,7 +73,8 @@ export const loginUser = async (req, res) => {
 // Logout User
 export const logoutUser = async (req, res) => {
   try {
-    await new BlockedToken({ token: req.token }).save();
+    const token = req.token;
+    await client.setEx(`blockedToken:${token}`, 24 * 60 * 60, "blocked");
     res.status(200).json(createResponse(true, "Logged out Successfully"));
   } catch (error) {
     res.status(500).json(createResponse(false, error.message));

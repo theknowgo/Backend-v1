@@ -17,16 +17,16 @@ export const sendotp = async (req, res) => {
         .json(createResponse(false, "Invalid phone number format!"));
     }
     const response = await sendOTP(phone);
+    console.log(response);
     if (!response.success) {
       return res
-        .status(500)
+        .status(400)
         .json(createResponse(false, response.message || "Failed to send OTP"));
     }
 
-    // res.json(createResponse(true, "OTP sent successfully!"));
-    res.json(
-      createResponse(true, response.message || "OTP sent successfully!")
-    );
+    res
+      .status(201)
+      .json(createResponse(true, response.message || "OTP sent successfully!"));
   } catch (error) {
     console.error("Error in sendotp:", error);
     res.status(500).json(createResponse(false, "Internal server error!"));
