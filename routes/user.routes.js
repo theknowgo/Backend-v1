@@ -14,13 +14,13 @@ import {
   updateOrderStatus,
   getOrdersByStatus,
 } from "../controllers/status.Controller.js";
-import { authUser, checkBanStatus } from "../middlewares/authMiddleware.js";
+import { authUser } from "../middlewares/authMiddleware.js";
 import {
   validateUserLogin,
   validateRating,
 } from "../services/validation.service.js";
-import { submitRating } from "../controllers/user.Controller.js";
-import { sendotp, verifyotp } from "../controllers/opt.controller.js";
+import { sendotp } from "../controllers/opt.controller.js";
+import upload from "../config/multerConfig.js";
 
 const router = express.Router();
 
@@ -33,32 +33,45 @@ router.get("/logout", authUser, userController.logoutUser);
 // User routes
 router.patch("/name/:id", authUser, userController.updateUserDetails);
 
+// set PFP route
+router.patch(
+  "/set-profile-picture", // Change this to "/set-profile-picture"
+  upload.single("image"),
+  authUser,
+  userController.setUserPFP
+);
 // Order routes
-router.post("/order", authUser, checkBanStatus, createOrder);
-router.get("/order/:orderId", authUser, checkBanStatus, getOrder);
+router.post("/order", authUser, createOrder);
+router.get("/order/:orderId", authUser, getOrder);
 
 // Address routes
-router.post("/address", authUser, checkBanStatus, addUserAddress);
-router.get("/address/:userId", authUser, checkBanStatus, getUserAddresses);
-router.patch("/address/:userId", authUser, checkBanStatus, updateUserAddress);
+router.post("/address", authUser, addUserAddress);
+router.get("/address/:userId", authUser, getUserAddresses);
+router.patch("/address/:userId", authUser, updateUserAddress);
 
 // Payment routes
-router.post("/payment", authUser, checkBanStatus, createPayment);
-router.get("/payment/:paymentId", authUser, checkBanStatus, getPayment);
+router.post("/payment", authUser, createPayment);
+router.get("/payment/:paymentId", authUser, getPayment);
 
 // Status routes
 router.patch(
   "/order/:orderId/status",
   authUser,
-  checkBanStatus,
+
   updateOrderStatus
 );
-router.get("/orders", authUser, checkBanStatus, getOrdersByStatus);
+router.get("/orders", authUser, getOrdersByStatus);
 
 // New rating route
-router.post("/rating", authUser, checkBanStatus, validateRating, submitRating);
+router.post(
+  "/rating",
+  authUser,
 
-// WhatsApp OTP routes
+  validateRating,
+  userController.submitRating
+);
+
+//  OTP routes
 router.post("/sendotp", sendotp);
-router.post("/verifyotp", verifyotp);
+
 export default router;

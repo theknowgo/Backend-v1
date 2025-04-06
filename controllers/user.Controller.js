@@ -172,9 +172,51 @@ const updateUserDetails = async (req, res) => {
   }
 };
 
+const setUserPFP = async (req, res) => {
+  try {
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    if (!imageUrl) {
+      return res.status(400).json(createResponse(false, "No image uploaded"));
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json(createResponse(false, "User not found"));
+    }
+
+    user.userPFP = imageUrl;
+    await user.save();
+    return res.status(200).json(createResponse(true, "PFP set successfully"));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
+// Set Default Address
+const setDefaultAddress = async (req, res) => {
+  try {
+    const { addressId } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json(createResponse(false, "User not found"));
+    }
+
+    user.defaultAddress = addressId;
+    await user.save();
+    return res
+      .status(200)
+      .json(createResponse(true, "Default address set successfully"));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
 export default {
   loginUser,
   logoutUser,
   submitRating,
   updateUserDetails,
+  setUserPFP,
+  setDefaultAddress,
 };

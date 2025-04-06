@@ -1,10 +1,9 @@
 import {
   calculateTotalCostOfServiceAndProduct,
-  calculateCappedTimeCost,
-  calculateIncrementalTimeCost,
   calculateQuickLookupCost,
 } from "../services/price.service.js";
 import { dynamicPrices } from "../config/dynamicPrice.js";
+
 const serviceAndProductPrice = async (req, res) => {
   try {
     // Destructure and validate query parameters
@@ -36,7 +35,7 @@ const serviceAndProductPrice = async (req, res) => {
       dynamicPrices.pricePerKm,
       dynamicPrices.platformFee,
       parsedTimeTaken,
-      parseFloat(dynamicPrices.vcForFirstMinute),
+      parseFloat(dynamicPrices.videoChatFee),
       parsedVcMin
     );
 
@@ -52,62 +51,6 @@ const serviceAndProductPrice = async (req, res) => {
       .status(500)
       .json({ status: false, message: "Internal server error", data: null });
   }
-};
-
-const cappedTimeForInfo = async (req, res) => {
-  const { timeInSeconds } = req.query;
-
-  if (!timeInSeconds) {
-    return res.status(400).json({
-      status: false,
-      message: "Missing timeInSeconds parameter",
-      data: null,
-    });
-  }
-
-  const parsedTimeInSeconds = parseInt(timeInSeconds);
-  if (isNaN(parsedTimeInSeconds)) {
-    return res.status(400).json({
-      status: false,
-      message: "Invalid query parameter values",
-      data: null,
-    });
-  }
-
-  const totalCost = calculateCappedTimeCost(parsedTimeInSeconds);
-  return res.json({
-    status: true,
-    message: "Total cost calculated successfully",
-    data: { totalCost: parseFloat(totalCost.toFixed(2)) },
-  });
-};
-
-const incrementalTimeForInfo = async (req, res) => {
-  const { timeInSeconds } = req.query;
-
-  if (!timeInSeconds) {
-    return res.status(400).json({
-      status: false,
-      message: "Missing timeInSeconds parameter",
-      data: null,
-    });
-  }
-
-  const parsedTimeInSeconds = parseInt(timeInSeconds);
-  if (isNaN(parsedTimeInSeconds)) {
-    return res.status(400).json({
-      status: false,
-      message: "Invalid query parameter values",
-      data: null,
-    });
-  }
-
-  const totalCost = calculateIncrementalTimeCost(parsedTimeInSeconds);
-  return res.json({
-    status: true,
-    message: "Total cost calculated successfully",
-    data: { totalCost: parseFloat(totalCost.toFixed(2)) },
-  });
 };
 
 const quickLookup = async (req, res) => {
@@ -138,7 +81,7 @@ const quickLookup = async (req, res) => {
       dynamicPrices.pricePerKm,
       dynamicPrices.platformFeeForlookup,
       parsedVideoCallSeconds,
-      dynamicPrices.vcForFirstMinute
+      dynamicPrices.videoChatFee
     );
 
     return res.json({
@@ -156,7 +99,5 @@ const quickLookup = async (req, res) => {
 
 export default {
   serviceAndProductPrice,
-  cappedTimeForInfo,
-  incrementalTimeForInfo,
   quickLookup,
 };
