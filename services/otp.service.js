@@ -18,8 +18,8 @@ export const verifyOTP = async (phoneNumber, otp) => {
       return false;
     }
     if (storedOTP === otp) {
-      // await client.del(`loginotp:${phoneNumber}`);
-      otpStore.delete(phoneNumber); // Remove OTP after verification
+      await client.del(`loginotp:${phoneNumber}`);
+      // otpStore.delete(phoneNumber); // Remove OTP after verification
       console.log(`✅ OTP verified for ${phoneNumber}`);
       return true;
     } else {
