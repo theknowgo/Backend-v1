@@ -11,7 +11,7 @@ import { verifyOTP } from "../services/otp.service.js";
 import client from "../config/redisConfig.js"; // Redis client
 
 // Login User
-export const loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   if (handleValidationErrors(req, res)) return;
 
   const { contactNumber, inputOTP, userType } = req.body;
@@ -71,7 +71,7 @@ export const loginUser = async (req, res) => {
 };
 
 // Logout User
-export const logoutUser = async (req, res) => {
+const logoutUser = async (req, res) => {
   try {
     const token = req.token;
     await client.setEx(`blockedToken:${token}`, 24 * 60 * 60, "blocked");
@@ -82,7 +82,7 @@ export const logoutUser = async (req, res) => {
 };
 
 // Submit Rating
-export const submitRating = async (req, res) => {
+const submitRating = async (req, res) => {
   try {
     const { partnerId, rating } = req.body;
 
@@ -139,4 +139,84 @@ export const submitRating = async (req, res) => {
   } catch (error) {
     res.status(500).json(createResponse(false, error.message));
   }
+};
+
+// Update User Details
+const updateUserDetails = async (req, res) => {
+  try {
+    const { firstName, lastName } = req.body;
+
+    const userId = req.params.id;
+    // Validate input
+    if (!userId || !firstName || !lastName) {
+      return res
+        .status(400)
+        .json(createResponse(false, "Missing required fields"));
+    }
+
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { firstName: firstName, lastName: lastName },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json(createResponse(false, "User not found"));
+    }
+
+    res
+      .status(200)
+      .json(createResponse(true, "User details updated successfully", user));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
+const setUserPFP = async (req, res) => {
+  try {
+    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    if (!imageUrl) {
+      return res.status(400).json(createResponse(false, "No image uploaded"));
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json(createResponse(false, "User not found"));
+    }
+
+    user.userPFP = imageUrl;
+    await user.save();
+    return res.status(200).json(createResponse(true, "PFP set successfully"));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
+// Set Default Address
+const setDefaultAddress = async (req, res) => {
+  try {
+    const { addressId } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json(createResponse(false, "User not found"));
+    }
+
+    user.defaultAddress = addressId;
+    await user.save();
+    return res
+      .status(200)
+      .json(createResponse(true, "Default address set successfully"));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
+export default {
+  loginUser,
+  logoutUser,
+  submitRating,
+  updateUserDetails,
+  setUserPFP,
+  setDefaultAddress,
 };
