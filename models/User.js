@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   userType: {
     type: String,
+    required: true,
     enum: ["Customer", "Localmate"],
   },
   contactNumber: {
@@ -31,27 +32,13 @@ const userSchema = new mongoose.Schema({
         `${props.value} is not a valid Indian contact number!`,
     },
   },
-  banCount: { type: Number, default: 0 },
-  banExpiration: { type: Date, default: null },
-  isPermanentlyBanned: { type: Boolean, default: false },
-  fevServices: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Service",
-    },
-  ],
-  feedback: { type: String },
-  defaultAddress: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "UserAddress",
-  },
   userPFP: { type: String },
-  status: {
-    type: String,
-    enum: ["active", "inactive", "online"],
-    default: "inactive",
-  },
 });
+
+userSchema.methods.saveCurrentCoordinate = function (latitude, longitude) {
+  this.currentLocation.coordinates = [longitude, latitude];
+  return this.save();
+};
 
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign(

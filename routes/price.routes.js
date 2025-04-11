@@ -1,4 +1,4 @@
-import priceController from "../controllers/price.Controller.js";
+// import priceController from "../controllers/price.Controller.js";
 import express from "express";
 const router = express.Router();
 

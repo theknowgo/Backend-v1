@@ -1,23 +1,29 @@
+// /config/upload.js
 import multer from "multer";
-import path from "path";
+import multerS3 from "multer-s3";
+import { S3Client } from "@aws-sdk/client-s3";
+import dotenv from "dotenv";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Change this to an Cloud Storage upload function in production
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+dotenv.config();
+
+const s3 = new S3Client({
+  region: "ap-south-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png"];
-    if (allowedTypes.includes(file.mimetype)) cb(null, true);
-    else cb(new Error("Only images are allowed!"));
-  },
+  storage: multerS3({
+    s3: s3,
+    bucket: "knowgoupload",
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: function (req, file, cb) {
+      const filename = `${Date.now()}-${file.originalname}`;
+      cb(null, filename);
+    },
+  }),
 });
 
 export default upload;
