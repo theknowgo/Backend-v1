@@ -1,11 +1,8 @@
 import express from "express";
+const router = express.Router();
+
 import userController from "../controllers/user.Controller.js";
-import { createOrder, getOrder } from "../controllers/order.Controller.js";
-import {
-  addUserAddress,
-  getUserAddresses,
-  updateUserAddress,
-} from "../controllers/userAddress.Controller.js";
+
 import {
   createPayment,
   getPayment,
@@ -22,8 +19,6 @@ import {
 import { sendotp } from "../controllers/opt.controller.js";
 import upload from "../config/multerConfig.js";
 
-const router = express.Router();
-
 // Public routes (no auth required)
 router.post("/login", validateUserLogin, userController.loginUser);
 
@@ -35,20 +30,11 @@ router.patch("/name/:id", authUser, userController.updateUserDetails);
 
 // set PFP route
 router.patch(
-  "/set-profile-picture", // Change this to "/set-profile-picture"
+  "/set-profile-picture",
   upload.single("image"),
   authUser,
   userController.setUserPFP
 );
-// Order routes
-router.post("/order", authUser, createOrder);
-router.get("/order/:orderId", authUser, getOrder);
-
-// Address routes
-router.post("/address", authUser, addUserAddress);
-router.get("/address/:userId", authUser, getUserAddresses);
-router.patch("/address/:userId", authUser, updateUserAddress);
-
 // Payment routes
 router.post("/payment", authUser, createPayment);
 router.get("/payment/:paymentId", authUser, getPayment);

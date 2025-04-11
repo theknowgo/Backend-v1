@@ -29,6 +29,10 @@ const userAddressSchema = new mongoose.Schema({
       max: 180,
     },
   },
+  isDefault: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const UserAddress = mongoose.model("UserAddress", userAddressSchema);

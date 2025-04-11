@@ -1,7 +1,7 @@
 import Order from "../models/Order.js";
 import { createResponse } from "../utils/helpers.js";
 
-export const createOrder = async (req, res) => {
+const createOrder = async (req, res) => {
   try {
     const { customerId, category, description, fare, localmateId } = req.body;
 
@@ -29,7 +29,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
-export const getOrder = async (req, res) => {
+const getOrder = async (req, res) => {
   try {
     const order = await Order.findOne({ orderId: req.params.orderId })
       .populate("customerId")
@@ -46,14 +46,62 @@ export const getOrder = async (req, res) => {
   }
 };
 
-export const listOrders = async (req, res) => {
+const listOrders = async (req, res) => {
   try {
-    const orders = await Order.find()
-      .populate("customerId")
-      .populate("partnerId")
-      .populate("orderDetailId");
+    const orders = await Order.find().populate("orderDetailId");
     res.status(200).json(createResponse(true, "Orders found", orders));
   } catch (error) {
     res.status(400).json(createResponse(false, error.message, null));
   }
+};
+const listOrdersByUserID = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Validate userId
+    if (!userId || typeof userId !== "string") {
+      return res
+        .status(400)
+        .json(createResponse(false, "Invalid or missing userId", null));
+    }
+
+    const orders = await Order.find({ customerId: userId });
+    if (!orders || orders.length === 0) {
+      return res
+        .status(404)
+        .json(createResponse(false, "No orders found for this user", null));
+    }
+    res
+      .status(200)
+      .json(createResponse(true, "Orders found by userID", orders));
+  } catch (error) {
+    res.status(400).json(createResponse(false, error.message, null));
+  }
+};
+
+const toggleFevOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params.orderId;
+    const order = await Order.findOne({ orderId });
+    if (!order) {
+      return res
+        .status(404)
+        .json(createResponse(false, "Order not found", null));
+    }
+
+    order.isFev = !order.isFev;
+    await order.save();
+
+    res.status(200).json(createResponse(true, "Order marked as Toggled", null));
+  } catch (error) {
+    res.status(400).json(createResponse(false, error.message, null));
+  }
+};
+
+export default {
+  createOrder,
+  getOrder,
+  toggleFevOrder,
+  listOrdersByUserID,
+  listOrders,
 };

@@ -3,13 +3,10 @@ import {
   checkUserExistsByNumber,
   createResponse,
 } from "../utils/helpers.js";
-import { createUser } from "../services/user.service.js";
-import BlockedToken from "../models/blockedTokken.js";
 import User from "../models/User.js";
 import Rating from "../models/rating.js";
 import { verifyOTP } from "../services/otp.service.js";
 import client from "../config/redisConfig.js"; // Redis client
-
 // Login User
 const loginUser = async (req, res) => {
   if (handleValidationErrors(req, res)) return;
@@ -84,7 +81,7 @@ const logoutUser = async (req, res) => {
 // Submit Rating
 const submitRating = async (req, res) => {
   try {
-    const { partnerId, rating } = req.body;
+    const { partnerId, rating, comment } = req.body;
 
     const partner = await User.findOne({
       userId: partnerId,
@@ -94,7 +91,12 @@ const submitRating = async (req, res) => {
       return res.status(404).json(createResponse(false, "Partner not found"));
     }
 
-    const newRating = new Rating({ partnerId, rating });
+    const newRating = new Rating({
+      partnerId,
+      rating,
+      comment,
+      userId: req.user._id,
+    });
     await newRating.save();
 
     if (rating === 1) {
@@ -124,7 +126,7 @@ const submitRating = async (req, res) => {
         await partner.save();
 
         return res.status(200).json(
-          createResponse(true, "Rating submitted and ban applied", {
+          createResponse(true, "Rating submitted", {
             banDetails: {
               count: partner.banCount,
               expiration: partner.banExpiration,
@@ -174,7 +176,7 @@ const updateUserDetails = async (req, res) => {
 
 const setUserPFP = async (req, res) => {
   try {
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageUrl = req.file?.location || null; // Assuming you're using multer-s3 and the image URL is in req.file.location
     if (!imageUrl) {
       return res.status(400).json(createResponse(false, "No image uploaded"));
     }
@@ -192,25 +194,8 @@ const setUserPFP = async (req, res) => {
   }
 };
 
-// Set Default Address
-const setDefaultAddress = async (req, res) => {
-  try {
-    const { addressId } = req.body;
 
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json(createResponse(false, "User not found"));
-    }
 
-    user.defaultAddress = addressId;
-    await user.save();
-    return res
-      .status(200)
-      .json(createResponse(true, "Default address set successfully"));
-  } catch (error) {
-    res.status(500).json(createResponse(false, error.message));
-  }
-};
 
 export default {
   loginUser,
@@ -218,5 +203,4 @@ export default {
   submitRating,
   updateUserDetails,
   setUserPFP,
-  setDefaultAddress,
 };

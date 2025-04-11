@@ -32,6 +32,9 @@
     "socket": "^0.14.57",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "twilio": "^5.5.1"
+    "twilio": "^5.5.1",
+    "@aws-sdk/client-s3": "^3.782.0",
+    "@aws-sdk/s3-request-presigner": "^3.782.0",
+    "multer-s3": "^3.0.1"
   }
 }

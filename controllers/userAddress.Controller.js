@@ -4,7 +4,7 @@ const createResponse = (status, message, data = null) => {
   return { status, message, data };
 };
 
-export const addUserAddress = async (req, res) => {
+const addUserAddress = async (req, res) => {
   try {
     const { userId, address } = req.body;
 
@@ -34,7 +34,7 @@ export const addUserAddress = async (req, res) => {
   }
 };
 
-export const getUserAddresses = async (req, res) => {
+const getUserAddresses = async (req, res) => {
   try {
     const addresses = await UserAddress.find({ userId: req.params.userId });
     res
@@ -47,7 +47,7 @@ export const getUserAddresses = async (req, res) => {
   }
 };
 
-export const updateUserAddress = async (req, res) => {
+const updateUserAddress = async (req, res) => {
   try {
     const { address } = req.body;
     const userId = req.params.userId;
@@ -76,4 +76,30 @@ export const updateUserAddress = async (req, res) => {
       .status(500)
       .json(createResponse(false, "Internal server error", error.message));
   }
+};
+
+// Set Default Address
+const setDefaultAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params.addressId;
+    const userAddress = UserAddress.findById({ _id: addressId });
+    if (!userAddress) {
+      return res.status(404).json(createResponse(false, "Address not found"));
+    }
+
+    userAddress.isDefault = !addressId.isDefault;
+    await userAddress.save();
+    return res
+      .status(200)
+      .json(createResponse(true, "Default address set successfully"));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
+export default {
+  addUserAddress,
+  getUserAddresses,
+  updateUserAddress,
+  setDefaultAddress,
 };
