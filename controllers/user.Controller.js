@@ -83,19 +83,20 @@ const submitRating = async (req, res) => {
   try {
     const { partnerId, rating, comment } = req.body;
 
+    // Validate input
     const partner = await User.findOne({
-      userId: partnerId,
-      userType: "Partner",
+      _id: partnerId,
+      userType: "Localmate",
     });
     if (!partner) {
-      return res.status(404).json(createResponse(false, "Partner not found"));
+      return res.status(404).json(createResponse(false, "Localmate not found"));
     }
 
     const newRating = new Rating({
       partnerId,
       rating,
       comment,
-      userId: req.user._id,
+      userId: req.user,
     });
     await newRating.save();
 
@@ -143,6 +144,21 @@ const submitRating = async (req, res) => {
   }
 };
 
+const getRatingByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const ratings = await Rating.find({ partnerId: userId });
+    if (!ratings.length) {
+      return res.status(404).json(createResponse(false, "No ratings found"));
+    }
+    res
+      .status(200)
+      .json(createResponse(true, "Ratings fetched successfully", ratings));
+  } catch (error) {
+    res.status(500).json(createResponse(false, error.message));
+  }
+};
+
 // Update User Details
 const updateUserDetails = async (req, res) => {
   try {
@@ -181,7 +197,7 @@ const setUserPFP = async (req, res) => {
       return res.status(400).json(createResponse(false, "No image uploaded"));
     }
 
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user);
     if (!user) {
       return res.status(404).json(createResponse(false, "User not found"));
     }
@@ -194,13 +210,11 @@ const setUserPFP = async (req, res) => {
   }
 };
 
-
-
-
 export default {
   loginUser,
   logoutUser,
   submitRating,
   updateUserDetails,
   setUserPFP,
+  getRatingByUserId,
 };

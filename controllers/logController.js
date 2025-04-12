@@ -10,7 +10,7 @@ export const createLog = async (req, res, next) => {
       url: req.url,
       status: res.statusCode || 200,
       responseTime: responseTime, // Use the calculated or default value
-      userId: req.user ? req.user._id : null,
+      userId: req.user ? req.user : null,
       payload: req.body || req.query,
     };
 

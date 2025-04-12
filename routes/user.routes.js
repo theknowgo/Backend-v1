@@ -26,6 +26,7 @@ router.post("/login", validateUserLogin, userController.loginUser);
 router.get("/logout", authUser, userController.logoutUser);
 
 // User routes
+
 router.patch("/name/:id", authUser, userController.updateUserDetails);
 
 // set PFP route

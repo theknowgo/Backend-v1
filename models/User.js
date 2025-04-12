@@ -33,12 +33,19 @@ const userSchema = new mongoose.Schema({
     },
   },
   userPFP: { type: String },
+  isAvailable: { type: Boolean, default: false },
+  currentLocation: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      default: "Point",
+    },
+    coordinates: {
+      type: [Number],
+      index: "2dsphere",
+    },
+  },
 });
-
-userSchema.methods.saveCurrentCoordinate = function (latitude, longitude) {
-  this.currentLocation.coordinates = [longitude, latitude];
-  return this.save();
-};
 
 userSchema.methods.generateAuthToken = function () {
   return jwt.sign(
