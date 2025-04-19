@@ -1,42 +1,82 @@
 import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema({
-  orderId: {
-    type: String,
-    default: () => new mongoose.Types.ObjectId().toString(),
-    unique: true,
-  },
   customerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  partnerId: {
+  localmateId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
-  },
-  orderDetailId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "OrderDetail",
-    required: true,
   },
   status: {
     type: String,
-    enum: ["Completed", "Ongoing", "Cancelled"],
+    enum: ["Completed", "Ongoing", "Cancelled", "Pending"],
     required: true,
   },
   pickupAddress: {
-    type: String,
+    type: {
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+      text: {
+        type: String,
+        required: true,
+      },
+    },
     required: true,
   },
   dropAddress: {
-    type: String,
+    type: {
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+      text: {
+        type: String,
+        required: true,
+      },
+    },
     required: true,
   },
   isFev: {
     type: Boolean,
     default: false,
+  },
+  category: [
+    {
+      type: String,
+      enum: [
+        "Shopping and product delivery",
+        "Information",
+        "Quick check",
+        "Services",
+      ],
+      required: true,
+    },
+  ],
+  description: {
+    type: String,
+    required: true,
+  },
+  timeTaken: {
+    type: Number,
+  },
+  fare: {
+    type: Number,
+    min: 0,
+  },
+  completedAt: {
+    type: Date,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  acceptedAt: {
+    type: Date,
   },
 });
 

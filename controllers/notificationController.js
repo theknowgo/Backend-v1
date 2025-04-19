@@ -1,5 +1,4 @@
 import Order from '../models/Order.js';
-import OrderDetail from '../models/OrderDetail.js';
 import User from '../models/User.js';
 
 export const notifyPartner = async (io, orderId) => {
