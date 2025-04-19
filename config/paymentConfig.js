@@ -1,7 +1,8 @@
-import Cashfree from "cashfree-sdk";
+import Cashfree from "cashfree-pg";
 
-Cashfree.XClientId = process.env.CASHFREE_APP_ID;
-Cashfree.XClientSecret = process.env.CASHFREE_SECRET_KEY;
-Cashfree.XEnvironment = Cashfree.Environment.SANDBOX; // Change to PRODUCTION in production
+Cashfree.init({
+  clientId: process.env.CASHFREE_APP_ID,
+  clientSecret: process.env.CASHFREE_SECRET_KEY,
+});
 
 export default Cashfree;
