@@ -36,6 +36,12 @@ export const findNearLocalmateNumber = async (req, res) => {
       distance: mate.distance,
     }));
 
+    if (result.length === 0) {
+      return res
+        .status(404)
+        .json(createResponse(false, "No localmates found nearby", null));
+    }
+
     return res
       .status(200)
       .json(createResponse(true, "Localmate Find Success", result));

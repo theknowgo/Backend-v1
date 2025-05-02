@@ -7,10 +7,8 @@ import { getAddressDistanceTime } from "../services/maps.service.js";
 const createOrder = async (req, res) => {
   try {
     const {
-      customerId,
       category,
       description,
-      localmateId,
       currentLocation,
       locationIntrested,
       estimatedPrice,
@@ -55,10 +53,9 @@ const createOrder = async (req, res) => {
     };
 
     const newOrder = new Order({
-      customerId,
+      customerId: req.user,
       category,
       description,
-      localmateId,
       status: "Pending",
       pickupAddress: currentLocation,
       dropAddress: locationIntrested,
@@ -67,7 +64,7 @@ const createOrder = async (req, res) => {
 
     await newOrder.save();
 
-    // Use pipeline for efficient Redis fetch
+    // pipeline for efficient Redis fetch
     const socketPipeline = client.multi();
     for (const [mateId] of nearbyMates) {
       socketPipeline.hGet("socketMap", mateId);
@@ -257,4 +254,5 @@ export default {
   listOrdersByUserID,
   listOrders,
   acceptOrder,
+  completeOrder,
 };

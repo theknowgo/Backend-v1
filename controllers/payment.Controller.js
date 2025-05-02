@@ -1,7 +1,7 @@
 import Cashfree from "../config/paymentConfig.js";
 import Order from "../models/Order.js";
+import crypto from "crypto"; // use 'import' instead of 'require'
 const baseURL = process.env.BASE_URL || "http://localhost:5000";
-const crypto = require("crypto");
 
 const createPaymentOrder = async (req, res) => {
   const {
@@ -25,7 +25,7 @@ const createPaymentOrder = async (req, res) => {
         customer_phone: customerPhone,
       },
       order_meta: {
-        return_url: "https://yourapp.com/payment-response?order_id={order_id}",
+        return_url: `https://yourapp.com/payment-response?order_id=${orderId}`,
         notify_url: `${baseURL}/api/v1/cashfree/webhook`,
       },
     });

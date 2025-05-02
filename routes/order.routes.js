@@ -6,13 +6,10 @@ import { authUser } from "../middlewares/authMiddleware.js";
 
 // Order routes
 router.post("/", orderController.createOrder);
-router.get("/order/:orderId", authUser, orderController.getOrder);
-router.patch(
-  "/order/toggle/:orderId",
-  authUser,
-  orderController.toggleFevOrder
-);
-router.get("/orders/:userId", authUser, orderController.listOrdersByUserID);
+router.get("/:orderId", authUser, orderController.getOrder);
+router.patch("/toggle/:orderId", authUser, orderController.toggleFevOrder);
+router.get("/user/:userId", authUser, orderController.listOrdersByUserID);
 router.patch("/accept/:orderId", authUser, orderController.acceptOrder);
+router.patch("/complete/:orderId", authUser, orderController.completeOrder);
 
 export default router;

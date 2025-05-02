@@ -20,6 +20,7 @@ export const validateRequest = (req, res, next) => {
 export const getCoordinates = async (req, res) => {
   try {
     const { address } = req.query;
+    
     const coordinates = await getAddressCoordinate(address);
     res
       .status(200)
