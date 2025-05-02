@@ -53,19 +53,15 @@ export const getAddressDistanceTime = async (origin, destination) => {
     if (response.data.status === "SUCCESS") {
       const rows = response.data.rows;
       const distancesAndDurations = rows
-        .map((row, rowIndex) => {
-          return row.elements.map((element, elementIndex) => {
+        .map((row) => {
+          return row.elements.map((element) => {
             if (element.status === "OK") {
               return {
-                row: rowIndex + 1,
-                element: elementIndex + 1,
-                distance: element.distance, //(usually in meters)
-                duration: element.duration, // ((usullly in seconds)
+                distance: element.distance.text, // Extract distance in text
+                duration: element.duration.text, // Extract duration in text
               };
             } else {
               return {
-                row: rowIndex + 1,
-                element: elementIndex + 1,
                 status: element.status,
               };
             }
@@ -78,8 +74,8 @@ export const getAddressDistanceTime = async (origin, destination) => {
       throw new Error("Unable to fetch distance and time");
     }
   } catch (err) {
-    console.error("Error fetching data:", err.response.data.message);
-    throw err.response.data.message;
+    console.error("Error fetching data:", err.response?.data?.message || err.message);
+    throw err.response?.data?.message || err.message;
   }
 };
 

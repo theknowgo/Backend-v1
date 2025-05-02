@@ -1,5 +1,6 @@
 import user from "../models/User.js";
 import { createResponse } from "../utils/helpers.js";
+import redis from "../config/redisConfig.js";
 
 export const findNearLocalmateNumber = async (req, res) => {
   try {
@@ -105,6 +106,12 @@ export const updateLocation = async (req, res) => {
       },
       { new: true, upsert: true }
     );
+
+    await redis.geoAdd("localmates:available", {
+      longitude: parseFloat(longitude),
+      latitude: parseFloat(latitude),
+      member: `localmate:${localmate._id}`,
+    });
 
     if (!localmate) {
       return res

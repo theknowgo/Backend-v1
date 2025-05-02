@@ -3,20 +3,24 @@ import { createResponse } from "../utils/helpers.js";
 
 export const sendotp = async (req, res) => {
   try {
-    let { contactNumber } = req.body;
+    let { contactNumber, condition } = req.body;
     if (!contactNumber) {
       return res
         .status(400)
         .json(createResponse(false, "Contact number required!"));
     }
-
+    if (!condition) {
+      return res
+        .status(400)
+        .json(createResponse(false, "Condition is required!"));
+    }
     const phone = contactNumber.trim();
     if (!/^\+?[0-9]{10,15}$/.test(phone)) {
       return res
         .status(400)
         .json(createResponse(false, "Invalid phone number format!"));
     }
-    const response = await sendOTP(phone);
+    const response = await sendOTP(phone, condition);
     if (!response.success) {
       return res
         .status(400)

@@ -3,10 +3,7 @@ const router = express.Router();
 
 import userController from "../controllers/user.Controller.js";
 
-import {
-  createPayment,
-  getPayment,
-} from "../controllers/payment.Controller.js";
+
 import {
   updateOrderStatus,
   getOrdersByStatus,
@@ -36,9 +33,6 @@ router.patch(
   authUser,
   userController.setUserPFP
 );
-// Payment routes
-router.post("/payment", authUser, createPayment);
-router.get("/payment/:paymentId", authUser, getPayment);
 
 // Status routes
 router.patch(

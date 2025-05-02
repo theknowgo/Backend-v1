@@ -5,7 +5,7 @@ import orderController from "../controllers/order.Controller.js";
 import { authUser } from "../middlewares/authMiddleware.js";
 
 // Order routes
-router.post("/order", authUser, orderController.createOrder);
+router.post("/", orderController.createOrder);
 router.get("/order/:orderId", authUser, orderController.getOrder);
 router.patch(
   "/order/toggle/:orderId",
@@ -13,5 +13,6 @@ router.patch(
   orderController.toggleFevOrder
 );
 router.get("/orders/:userId", authUser, orderController.listOrdersByUserID);
+router.patch("/accept/:orderId", authUser, orderController.acceptOrder);
 
 export default router;

@@ -1,6 +1,6 @@
 // import priceController from "../controllers/price.Controller.js";
-import express from "express";
-const router = express.Router();
+// import express from "express";
+// const router = express.Router();
 
 // router.get(
 //   "/service-and-product-price",
@@ -13,4 +13,4 @@ const router = express.Router();
 // );
 // router.get("/quick-lockup-cost", priceController.quickLookup);
 
-export default router;
+// export default router;

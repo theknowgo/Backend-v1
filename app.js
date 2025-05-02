@@ -11,7 +11,6 @@ import { setRequestTiming } from "./middlewares/timingMiddleware.js";
 // Import routes
 import userRoutes from "./routes/user.routes.js";
 import mapRoutes from "./routes/maps.routes.js";
-import priceRoutes from "./routes/price.routes.js";
 import helpRoutes from "./routes/help.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import addressRoutes from "./routes/address.routes.js";
@@ -32,7 +31,7 @@ app.use(setRequestTiming); // Serve uploaded images
 
 app.use("/api/v1/users", userRoutes); // User routes
 app.use("/api/v1/maps", mapRoutes); // Map routes
-app.use("/api/v1/prices", priceRoutes); // Price routes
+// app.use("/api/v1/prices", priceRoutes); // Price routes
 app.use("/api/v1/help", helpRoutes); // Help routes
 app.use("/api/v1/orders", orderRoutes); // Order routes
 app.use("/api/v1/addresses", addressRoutes); // Address routes
